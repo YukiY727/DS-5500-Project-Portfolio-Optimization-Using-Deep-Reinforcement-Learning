@@ -65,7 +65,7 @@ def main(stocks = True):
     tf.compat.v1.reset_default_graph()
 
     # sess
-    sess = tf.Session()
+    sess = tf.compat.v1.Session()
 
     # initialize networks
     pf_opt_agent = PolicyLSTM(ohlc_features_num, ticker_num, num_trading_periods, sess, optimizer, trading_cost, cash_bias_init, interest_rate, equiweight_vector, adjusted_rewards_alpha, num_filter_layer)
