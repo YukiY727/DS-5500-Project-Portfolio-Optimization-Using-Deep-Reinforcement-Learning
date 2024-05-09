@@ -24,10 +24,10 @@ class PolicyCNN(object):
         self.optimizer = optimizer
         self.sess = sess
 
-        self.X_t = tf.placeholder(tf.float32, [None, self.ohlc_feature_num, self.ticker_num, self.num_trading_periods])
-        self.weights_previous_t = tf.placeholder(tf.float32, [None, self.ticker_num + 1])
-        self.pf_previous_t = tf.placeholder(tf.float32, [None, 1])
-        self.daily_returns_t = tf.placeholder(tf.float32, [None, self.ticker_num]) 
+        self.X_t = tf.compat.v1.placeholder(tf.float32, [None, self.ohlc_feature_num, self.ticker_num, self.num_trading_periods])
+        self.weights_previous_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num + 1])
+        self.pf_previous_t = tf.compat.v1.placeholder(tf.float32, [None, 1])
+        self.daily_returns_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num]) 
         cash_bias = tf.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer = tf.constant_initializer(self.cash_bias_init))
         shape_X_t = tf.shape(self.X_t)[0]
         self.cash_bias = tf.tile(cash_bias, tf.stack([shape_X_t, 1, 1, 1]))
