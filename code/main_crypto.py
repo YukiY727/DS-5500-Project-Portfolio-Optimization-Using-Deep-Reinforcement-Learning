@@ -58,7 +58,7 @@ def main(stocks = True):
 
 
     #---------------------------------------- training - Using the RL framework ------------------------------------
-    tf.reset_default_graph()
+    tf.compat.v1.reset_default_graph()
 
     # sess
     sess = tf.Session()

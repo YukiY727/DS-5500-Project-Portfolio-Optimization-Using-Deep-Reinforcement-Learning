@@ -62,7 +62,7 @@ def main(stocks = True):
 		ReturnRate = interest_rate, WindowSize = num_trading_periods, TrainTestSplit = train_data_ratio)
 
 #---------------------------------------- training - Using the RL framework ------------------------------------
-	tf.reset_default_graph()
+	tf.compat.v1.reset_default_graph()
 
 	with tf.Session() as sess:
 
