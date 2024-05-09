@@ -12,8 +12,8 @@ stocks_data  = stocks_data.sort_values(['ticker', 'Date'])
 print('stocks considered : ' + str(np.unique(stocks_data['ticker'])))
 
 #Calculating Mean Returns and Covariance Matrix
-pivot_table = pd.pivot_table(stocks_data, values='Close', index=['Date'],columns=['ticker'])
-returns = pivot_table.pct_change().dropna()
+pivot_table_stocks = pd.pivot_table(stocks_data, values='Close', index=['Date'],columns=['ticker'])
+returns = pivot_table_stocks.pct_change().dropna()
 stocks_returns_mean = returns.mean()
 stocks_covariance_matrix = returns.cov()
 
@@ -33,8 +33,8 @@ for ticker in np.unique(crypto_data['crypto_ticker']):
 crypto_data_filtered = crypto_data.loc[crypto_data['Date'] >= smallest_date]
 crypto_data_filtered  = crypto_data_filtered.sort_values(['crypto_ticker', 'Date'])
 
-pivot_table = pd.pivot_table(crypto_data_filtered, values='Close', index=['Date'],columns=['crypto_ticker'])
-returns_crypto = pivot_table.pct_change().dropna()
+pivot_table_crypto = pd.pivot_table(crypto_data_filtered, values='Close', index=['Date'],columns=['crypto_ticker'])
+returns_crypto = pivot_table_crypto.pct_change().dropna()
 crypto_returns_mean = returns_crypto.mean()
 crypto_covariance_matrix = returns_crypto.cov()
 
