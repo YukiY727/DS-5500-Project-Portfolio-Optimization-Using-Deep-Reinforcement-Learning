@@ -30,7 +30,7 @@ class PolicyLSTM(object):
         self.weights_previous_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num + 1])
         self.pf_previous_t = tf.compat.v1.placeholder(tf.float32, [None, 1])
         self.daily_returns_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num]) 
-        cash_bias = tf.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer = tf.constant_initializer(self.cash_bias_init))
+        cash_bias = tf.compat.v1.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer = tf.constant_initializer(self.cash_bias_init))
         shape_X_t = tf.shape(self.X_t)[0]
         self.cash_bias = tf.tile(cash_bias, tf.stack([shape_X_t, 1, 1, 1]))
 
