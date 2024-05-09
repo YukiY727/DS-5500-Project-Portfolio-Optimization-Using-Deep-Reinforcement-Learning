@@ -35,7 +35,7 @@ class PolicyCNN(object):
 
         def convolution_layers(X_t, num_filter_layer_1, kernel_size, num_filter_layer_2, num_trading_periods):
             with tf.compat.v1.variable_scope("Convolution1"):
-                convolution1 = tf.layers.conv2d(
+                convolution1 = tf.compat.v1.layers.conv2d(
                 inputs = tf.transpose(X_t, perm=[0, 3, 2, 1]),
                 activation = tf.nn.tanh,
                 filters = num_filter_layer_1,
@@ -45,7 +45,7 @@ class PolicyCNN(object):
 
 
             with tf.compat.v1.variable_scope("Convolution2"):
-                convolution2 = tf.layers.conv2d(
+                convolution2 = tf.compat.v1.layers.conv2d(
                 inputs = convolution1,
                 activation = tf.nn.tanh,
                 filters = num_filter_layer_2,
@@ -54,7 +54,7 @@ class PolicyCNN(object):
                 padding = 'same')
 
             with tf.compat.v1.variable_scope("Convolution3"):
-                self.convolution3 = tf.layers.conv2d(
+                self.convolution3 = tf.compat.v1.layers.conv2d(
                     inputs = convolution2,
                     activation = tf.nn.relu,
                     filters = 1,

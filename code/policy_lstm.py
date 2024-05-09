@@ -63,7 +63,7 @@ class PolicyLSTM(object):
 
         def policy_output(network, cash_bias):
             with tf.compat.v1.variable_scope("Convolution_Layer"):
-                self.conv = tf.layers.conv2d(
+                self.conv = tf.compat.v1.layers.conv2d(
                     inputs = network,
                     activation = tf.nn.relu,
                     filters = 1,
