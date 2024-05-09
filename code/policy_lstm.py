@@ -116,7 +116,7 @@ class PolicyLSTM(object):
         self.lstm_layer = lstm(self.X_t)
         self.action_chosen = policy_output(self.lstm_layer, self.cash_bias)
         self.adjusted_reward = reward(shape_X_t, self.action_chosen, self.interest_rate, self.weights_previous_t, self.pf_previous_t, self.daily_returns_t, self.trading_cost)
-        self.train_op = optimizer.minimize(-self.adjusted_reward)
+        self.train_op = optimizer.minimize(-self.adjusted_reward, var_list=None)
 
     def compute_weights(self, X_t_, weights_previous_t_):
         # tf.print(self.action_chosen)
