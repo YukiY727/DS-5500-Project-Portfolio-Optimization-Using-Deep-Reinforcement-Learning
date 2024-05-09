@@ -1,9 +1,9 @@
 from __future__ import print_function
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import tflearn
 
-tf.compat.v1.disable_eager_execution()
+tf.disable_eager_execution()
 class PolicyLSTM(object):
     '''
     Using this class we will build policy for the LSTM network.
@@ -26,11 +26,11 @@ class PolicyLSTM(object):
         layers=2
         lstm_neurons = 20
 
-        self.X_t = tf.compat.v1.placeholder(tf.float32, [None, self.ohlc_feature_num, self.ticker_num, self.num_trading_periods])
-        self.weights_previous_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num + 1])
-        self.pf_previous_t = tf.compat.v1.placeholder(tf.float32, [None, 1])
-        self.daily_returns_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num]) 
-        cash_bias = tf.compat.v1.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer = tf.constant_initializer(self.cash_bias_init))
+        self.X_t = tf.placeholder(tf.float32, [None, self.ohlc_feature_num, self.ticker_num, self.num_trading_periods])
+        self.weights_previous_t = tf.placeholder(tf.float32, [None, self.ticker_num + 1])
+        self.pf_previous_t = tf.placeholder(tf.float32, [None, 1])
+        self.daily_returns_t = tf.placeholder(tf.float32, [None, self.ticker_num]) 
+        cash_bias = tf.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer = tf.constant_initializer(self.cash_bias_init))
         shape_X_t = tf.shape(self.X_t)[0]
         self.cash_bias = tf.tile(cash_bias, tf.stack([shape_X_t, 1, 1, 1]))
 
@@ -62,8 +62,8 @@ class PolicyLSTM(object):
             return network
 
         def policy_output(network, cash_bias):
-            with tf.compat.v1.variable_scope("Convolution_Layer"):
-                self.conv = tf.compat.v1.layers.conv2d(
+            with tf.variable_scope("Convolution_Layer"):
+                self.conv = tf.layers.conv2d(
                     inputs = network,
                     activation = tf.nn.relu,
                     filters = 1,
@@ -71,7 +71,7 @@ class PolicyLSTM(object):
                     kernel_size = (1, 1),
                     padding = 'same')
 
-            with tf.compat.v1.variable_scope("Policy-Output"):
+            with tf.variable_scope("Policy-Output"):
                 tensor_squeeze = tf.squeeze(tf.concat([cash_bias, self.conv], axis=2), [1,3])
                 self.action = tf.nn.softmax(tensor_squeeze)
             return self.action
@@ -79,7 +79,7 @@ class PolicyLSTM(object):
 
         def reward(shape_X_t, action_chosen, interest_rate, weights_previous_t, pf_previous_t, daily_returns_t, trading_cost):
             #Calculating reward for current Portfolio
-            with tf.compat.v1.variable_scope("Reward"):
+            with tf.variable_scope("Reward"):
                 cash_return = tf.tile(tf.constant(1 + interest_rate, shape=[1, 1]), tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, daily_returns_t], axis=1)
                 pf_vector_t = action_chosen * pf_previous_t
@@ -97,7 +97,7 @@ class PolicyLSTM(object):
                 self.instantaneous_reward = (portfolio_value - pf_previous_t) / pf_previous_t
                 
             #Calculating Reward for Equiweight portfolio
-            with tf.compat.v1.variable_scope("Reward-Equiweighted"):
+            with tf.variable_scope("Reward-Equiweighted"):
                 cash_return = tf.tile(tf.constant(1 + interest_rate, shape=[1, 1]), tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, daily_returns_t], axis=1)
   
@@ -107,7 +107,7 @@ class PolicyLSTM(object):
                 self.instantaneous_reward_eq = (portfolio_value_eq - pf_previous_t) / pf_previous_t
 
             #Calculating Adjusted Rewards
-            with tf.compat.v1.variable_scope("Reward-adjusted"):
+            with tf.variable_scope("Reward-adjusted"):
                 self.adjusted_reward = self.instantaneous_reward - self.instantaneous_reward_eq - self.adjusted_rewards_alpha * tf.reduce_max(action_chosen)
                 
             return self.adjusted_reward

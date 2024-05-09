@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import tqdm
 import numpy as np
 
@@ -62,9 +62,9 @@ def main(stocks = True):
 		ReturnRate = interest_rate, WindowSize = num_trading_periods, TrainTestSplit = train_data_ratio)
 
 #---------------------------------------- training - Using the RL framework ------------------------------------
-	tf.compat.v1.reset_default_graph()
+	tf.reset_default_graph()
 
-	with tf.compat.v1.Session() as sess:
+	with tf.Session() as sess:
 
 		# initialize networks
 		pf_opt_agent = PolicyCNN(ohlc_features_num, ticker_num, num_trading_periods, sess, optimizer, trading_cost, cash_bias_init, interest_rate, 
