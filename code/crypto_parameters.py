@@ -1,5 +1,5 @@
 import numpy as np 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 #dataset information
 data_path = 'crypto_data_input.npy'
