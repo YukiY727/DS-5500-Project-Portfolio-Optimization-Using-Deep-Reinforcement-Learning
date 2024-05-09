@@ -34,7 +34,7 @@ class PolicyCNN(object):
         self.cash_bias = tf.tile(cash_bias, tf.stack([shape_X_t, 1, 1, 1]))
 
         def convolution_layers(X_t, num_filter_layer_1, kernel_size, num_filter_layer_2, num_trading_periods):
-            with tf.variable_scope("Convolution1"):
+            with tf.compat.v1.variable_scope("Convolution1"):
                 convolution1 = tf.layers.conv2d(
                 inputs = tf.transpose(X_t, perm=[0, 3, 2, 1]),
                 activation = tf.nn.tanh,
@@ -44,7 +44,7 @@ class PolicyCNN(object):
                 padding = 'same')
 
 
-            with tf.variable_scope("Convolution2"):
+            with tf.compat.v1.variable_scope("Convolution2"):
                 convolution2 = tf.layers.conv2d(
                 inputs = convolution1,
                 activation = tf.nn.tanh,
@@ -53,7 +53,7 @@ class PolicyCNN(object):
                 kernel_size = (1, num_trading_periods),
                 padding = 'same')
 
-            with tf.variable_scope("Convolution3"):
+            with tf.compat.v1.variable_scope("Convolution3"):
                 self.convolution3 = tf.layers.conv2d(
                     inputs = convolution2,
                     activation = tf.nn.relu,
@@ -66,7 +66,7 @@ class PolicyCNN(object):
 
 
         def policy_output(convolution, cash_bias):
-            with tf.variable_scope("Policy-Output"):
+            with tf.compat.v1.variable_scope("Policy-Output"):
                 tensor_squeeze = tf.squeeze(tf.concat([cash_bias, convolution], axis=2), [1, 3])
                 self.action = tf.nn.softmax(tensor_squeeze)
             return self.action
@@ -74,7 +74,7 @@ class PolicyCNN(object):
 
         def reward(shape_X_t, action_chosen, interest_rate, weights_previous_t, pf_previous_t, daily_returns_t, trading_cost):
             #Calculating reward for current Portfolio
-            with tf.variable_scope("Reward"):
+            with tf.compat.v1.variable_scope("Reward"):
                 cash_return = tf.tile(tf.constant(1 + interest_rate, shape=[1, 1]), tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, daily_returns_t], axis=1)
                 pf_vector_t = action_chosen * pf_previous_t
@@ -92,7 +92,7 @@ class PolicyCNN(object):
                 self.instantaneous_reward = (portfolio_value - pf_previous_t) / pf_previous_t
                 
             #Calculating Reward for Equiweight portfolio
-            with tf.variable_scope("Reward-Equiweighted"):
+            with tf.compat.v1.variable_scope("Reward-Equiweighted"):
                 cash_return = tf.tile(tf.constant(1 + interest_rate, shape=[1, 1]), tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, daily_returns_t], axis=1)
   
@@ -102,7 +102,7 @@ class PolicyCNN(object):
                 self.instantaneous_reward_eq = (portfolio_value_eq - pf_previous_t) / pf_previous_t
 
             #Calculating Adjusted Rewards
-            with tf.variable_scope("Reward-adjusted"):
+            with tf.compat.v1.variable_scope("Reward-adjusted"):
                 self.adjusted_reward = self.instantaneous_reward - self.instantaneous_reward_eq - self.adjusted_rewards_alpha * tf.reduce_max(action_chosen)
                 
             return self.adjusted_reward
