@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+tf.compat.v1.disable_eager_execution()
 class PolicyCNN(object):
     '''
     Using this class we will build policy for the cnn network.

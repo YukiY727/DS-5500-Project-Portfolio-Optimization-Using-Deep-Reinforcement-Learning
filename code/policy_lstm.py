@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import tflearn
 
+tf.compat.v1.disable_eager_execution()
 class PolicyLSTM(object):
     '''
     Using this class we will build policy for the LSTM network.
