@@ -45,7 +45,7 @@ adjusted_rewards_alpha = 0.1
 #hyper parameters for the optimizer
 l2_reg_coef = 1e-8
 adam_opt_alpha = 9e-2
-optimizer = tf.train.AdamOptimizer(adam_opt_alpha)
+optimizer = tf.optimizers.Adam(adam_opt_alpha)
 
 #hyper parameters for trading 
 trading_cost = 1/100000
