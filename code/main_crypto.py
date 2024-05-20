@@ -68,7 +68,7 @@ def main(stocks = True):
             equiweight_vector, adjusted_rewards_alpha, kernel_size, num_filters_layer_1, num_filters_layer_2)
 
     # initialize tensorflow graphs
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
 
     train_pf_values = []
     train_pf_values_equiweight = []
