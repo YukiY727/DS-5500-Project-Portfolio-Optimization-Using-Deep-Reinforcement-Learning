@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-
 tf.compat.v1.disable_eager_execution()
 
 class PolicyCNN(object):
@@ -18,8 +17,8 @@ class PolicyCNN(object):
         self.trading_cost = trading_cost
         self.cash_bias_init = cash_bias_init
         self.interest_rate = interest_rate
-        self.equiweight_vector = equiweight_vector
-        self.adjusted_rewards_alpha = adjusted_rewards_alpha 
+        self.equiweight_vector = tf.constant(equiweight_vector, dtype=tf.float32)
+        self.adjusted_rewards_alpha = adjusted_rewards_alpha
         self.kernel_size = kernel_size
         self.num_filter_layer_1 = num_filter_layer_1
         self.num_filter_layer_2 = num_filter_layer_2
@@ -99,7 +98,6 @@ class PolicyCNN(object):
             y_t = tf.concat([cash_return, daily_returns_t], axis=1)
 
             pf_vector_eq = self.equiweight_vector * pf_previous_t
-
             portfolio_value_eq = tf.norm(tf.multiply(pf_vector_eq, y_t), ord=1)
             instantaneous_reward_eq = (portfolio_value_eq - pf_previous_t) / pf_previous_t
 
@@ -120,8 +118,8 @@ class PolicyCNN(object):
             adjusted_reward = self.reward(tf.shape(X_t_)[0], self.action_chosen, self.interest_rate, weights_previous_t_, pf_previous_t_, daily_returns_t_, self.trading_cost)
             loss = -adjusted_reward
 
-        grads = tape.gradient(loss, self.sess.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.sess.trainable_variables))
+        grads = tape.gradient(loss, tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES))  # Use tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES) to get the trainable variables
+        self.optimizer.apply_gradients(zip(grads, tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES)))  # Use tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES) again here
         self.sess.run(self.train_op, feed_dict={self.X_t: X_t_,
                                                 self.weights_previous_t: weights_previous_t_,
                                                 self.pf_previous_t: pf_previous_t_,
