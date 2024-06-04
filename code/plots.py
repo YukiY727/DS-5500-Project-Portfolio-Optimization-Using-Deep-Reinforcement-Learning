@@ -11,6 +11,7 @@ def plot_cpv(final_pf_values_opt, final_pf_values_eq, initial_portfolio_value, p
 	plt.xlabel('test steps')
 	plt.ylabel('cumulative portfolio value')
 	plt.savefig('test_result_plots/' + plot_name)
+	plt.clf()
 
 #function to plot final wt vectors assigned
 def plot_wts_assigned(wt_vector, num_stocks, ticker_list, plot_name):
@@ -19,4 +20,5 @@ def plot_wts_assigned(wt_vector, num_stocks, ticker_list, plot_name):
 	plt.xticks(np.arange(num_stocks + 1), ['Cash'] + ticker_list, rotation=45)
 	plt.xlabel('tickers')
 	plt.savefig('test_result_plots/' + plot_name)
+	plt.clf()
 
