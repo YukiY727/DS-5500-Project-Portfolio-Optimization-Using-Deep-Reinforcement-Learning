@@ -143,6 +143,7 @@ def main(stocks=True):
             ) = [], [], [], [], [], []
 
             training_batch_t_selection = False
+            # training_batch_tは学習を開始する時点の日付
             while training_batch_t_selection == False:
                 training_batch_t = (
                     training_steps
@@ -165,6 +166,7 @@ def main(stocks=True):
             for training_batch_num in tqdm.tnrange(
                 training_batch_size, desc="Training Batches"
             ):
+                # -1は適切なサイズにするためのプレイスホルダー
                 X_t = state[0].reshape([-1] + list(state[0].shape))
                 Wt_previous = state[1].reshape([-1] + list(state[1].shape))
                 pf_value_previous = state[2]
