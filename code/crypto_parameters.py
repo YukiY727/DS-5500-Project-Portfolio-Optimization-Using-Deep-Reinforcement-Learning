@@ -34,8 +34,8 @@ weight_vector_init = np.array(np.array([1] + [0] * ticker_num))
 portfolio_value_init = 10000
 weight_vector_init_test = np.array(np.array([1] + [0] * ticker_num))
 portfolio_value_init_test = 10000
-num_episodes = 1000
-num_batches = 10
+num_episodes = 50
+num_batches = 5
 equiweight_vector = np.array(np.array([1/(ticker_num + 1)] * (ticker_num + 1)))
 #probability of exploitation in the RL framework (acting greedily)
 epsilon = 0.8
