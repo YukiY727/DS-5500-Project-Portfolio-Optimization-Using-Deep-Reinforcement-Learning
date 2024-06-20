@@ -39,16 +39,17 @@ class RLEnv():
         self.TerminateRows = int((self.Dataset.shape[2] - self.WindowSize) * TrainTestSplit)
         
     def UpdatedOpenValues(self, T):
-        """現金のリターンと、T期間目の各銘柄のオープン価格のリターンを返す。"""
+        """現金のリターンと、T期間目の各銘柄のClose価格のリターンを返す。"""
         return np.array([1+self.ReturnRate]+self.Dataset[-1,:,T].tolist())
     
     def InputTensor(self, Tensor, T):
-        
+        """T期間目のデータを返す。"""
         return Tensor[: , : , T - self.WindowSize:T]
     
     def ResetEnvironment(self, InitWeight, InitPortfolio, T):
-        self.state= (self.InputTensor(self.Dataset, self.WindowSize) , InitWeight , InitPortfolio)
-        self.TimeLength = self.WindowSize + T
+        """T期間目の状態を初期化して返す。"""
+        self.state= (self.InputTensor(self.Dataset, int(T)) , InitWeight , InitPortfolio)
+        self.TimeLength = T
         self.Done = False
         
         return self.state, self.Done
