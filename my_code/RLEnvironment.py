@@ -35,14 +35,15 @@ class RLEnv():
         self.TimeLength = None
         self.Terminate = False
         
-        # Termination cutoff
+        # Termination cutoff= (Total number of trading periods - WindowSize) * TrainTestSplit
         self.TerminateRows = int((self.Dataset.shape[2] - self.WindowSize) * TrainTestSplit)
         
     def UpdatedOpenValues(self, T):
-        # This function provides the 
+        """現金のリターンと、T期間目の各銘柄のオープン価格のリターンを返す。"""
         return np.array([1+self.ReturnRate]+self.Dataset[-1,:,T].tolist())
     
     def InputTensor(self, Tensor, T):
+        
         return Tensor[: , : , T - self.WindowSize:T]
     
     def ResetEnvironment(self, InitWeight, InitPortfolio, T):

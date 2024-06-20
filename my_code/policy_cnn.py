@@ -26,9 +26,17 @@ class PolicyCNN(object):
         self.optimizer = optimizer
         self.sess = sess
 
+        # 入力データ(OHLCデータ)を受け取るためのplaceholder
+        # None: バッチサイズ(実行時に決定), ohlc_feature_num: OHLCデータの特徴量数(4), ticker_num: 銘柄数(6), num_trading_periods: 1エピソードの取引期間数
         self.X_t = tf.compat.v1.placeholder(tf.float32, [None, self.ohlc_feature_num, self.ticker_num, self.num_trading_periods])
+        # 前の時間ステップでの資産配分重みを受け取るためのプレースホルダー。
+        # None: バッチサイズ(実行時に決定), ticker_num + 1: 銘柄数+1(現金)
         self.weights_previous_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num + 1])
+        # 前の時間ステップでのポートフォリオの値を受け取るためのプレースホルダー。
+        # None: バッチサイズ(実行時に決定), 1: ポートフォリオ単一の値
         self.pf_previous_t = tf.compat.v1.placeholder(tf.float32, [None, 1])
+        #  各ティッカーの1日ごとのリターンを受け取るためのプレースホルダー。
+        # None: バッチサイズ(実行時に決定), ticker_num: 銘柄数
         self.daily_returns_t = tf.compat.v1.placeholder(tf.float32, [None, self.ticker_num]) 
         cash_bias = tf.compat.v1.get_variable('cash_bias', shape=[1, 1, 1, 1], initializer=tf.constant_initializer(self.cash_bias_init))
         shape_X_t = tf.shape(self.X_t)[0]

@@ -5,13 +5,10 @@ from crypto_parameters import *
 from data_pre_processing import *
 from pf_vector_memory import *
 from plots import *
-from policy_cnn import *
+from policy_lstm import *
 from RLEnvironment import *
 
-
-def get_random_action(num_tickers):
-    vector_rand = np.random.rand(num_tickers + 1)
-    return vector_rand / np.sum(vector_rand)
+num_filter_layer = 20
 
 
 def max_drawdown(
@@ -39,21 +36,9 @@ def max_drawdown(
     return max_drawdown_value
 
 
-def RoMad(
-    weights, mdd, returns_mean=crypto_returns_mean, time_period=num_trading_periods
-):
-    weights = weights.reshape(
-        len(
-            weights[0],
-        )
-    )
-    weights = weights[1:]
-    portfolio_return = np.sum(returns_mean.values * weights * time_period)
-    if mdd > 0:
-        romad = portfolio_return / mdd
-    else:
-        romad = 0
-    return romad
+def get_random_action(num_tickers):
+    vector_rand = np.random.rand(num_tickers + 1)
+    return vector_rand / np.sum(vector_rand)
 
 
 def sharpe_crypto(
@@ -71,6 +56,23 @@ def sharpe_crypto(
     )
     sharpe_ratio = portfolio_return / portfolio_volatility
     return sharpe_ratio
+
+
+def RoMad(
+    weights, mdd, returns_mean=crypto_returns_mean, time_period=num_trading_periods
+):
+    weights = weights.reshape(
+        len(
+            weights[0],
+        )
+    )
+    weights = weights[1:]
+    portfolio_return = np.sum(returns_mean.values * w * time_period)
+    if mdd > 0:
+        romad = portfolio_return / mdd
+    else:
+        romad = 0
+    return romad
 
 
 def main(stocks=True):
@@ -101,7 +103,7 @@ def main(stocks=True):
     sess = tf.compat.v1.Session()
 
     # initialize networks
-    pf_opt_agent = PolicyCNN(
+    pf_opt_agent = PolicyLSTM(
         ohlc_features_num,
         ticker_num,
         num_trading_periods,
@@ -112,13 +114,11 @@ def main(stocks=True):
         interest_rate,
         equiweight_vector,
         adjusted_rewards_alpha,
-        kernel_size,
-        num_filters_layer_1,
-        num_filters_layer_2,
+        num_filter_layer,
     )
 
     # initialize tensorflow graphs
-    sess.run(tf.compat.v1.global_variables_initializer())
+    sess.run(tf.global_variables_initializer())
 
     train_pf_values = []
     train_pf_values_equiweight = []
@@ -143,7 +143,6 @@ def main(stocks=True):
             ) = [], [], [], [], [], []
 
             training_batch_t_selection = False
-            # training_batch_tは学習を開始する時点の日付
             while training_batch_t_selection == False:
                 training_batch_t = (
                     training_steps
@@ -166,7 +165,6 @@ def main(stocks=True):
             for training_batch_num in tqdm.tnrange(
                 training_batch_size, desc="Training Batches"
             ):
-                # -1は適切なサイズにするためのプレイスホルダー
                 X_t = state[0].reshape([-1] + list(state[0].shape))
                 Wt_previous = state[1].reshape([-1] + list(state[1].shape))
                 pf_value_previous = state[2]
@@ -204,14 +202,14 @@ def main(stocks=True):
                 print("current portfolio value : " + str(pf_value_previous))
                 print("weights assigned : " + str(Wt_previous))
                 print("sharpe_ratio:", sharpe_ratio)
-                print("RoMad:", romad)
+                print("RoMad", romad)
                 print("equiweight portfolio value : " + str(pf_value_t_equiweight))
 
             train_pf_values.append(pf_value_t)
             train_pf_values_equiweight.append(pf_value_t_equiweight)
 
             # training the network after each batch to maximize the reward
-            pf_opt_agent.train_cnn(
+            pf_opt_agent.train_lstm(
                 np.array(list_X_t),
                 np.array(list_wt_previous),
                 np.array(list_pf_value_previous),
@@ -263,8 +261,11 @@ def main(stocks=True):
         romad = round(RoMad(weights=Wt_previous, mdd=mdd))
 
         print("------------------ testing -----------------------")
+        # print('current portfolio value : ' + str(pf_value_previous))
+        # print('weights assigned : ' + str(wt_previous))
+        # print('equiweight portfolio value : ' + str(pf_value_t_equiweight))
         print("sharpe_ratio:", sharpe_ratio)
-        print("RoMad:", romad)
+        print("RoMad", romad)
 
         test_pf_values.append(pf_value_t)
         test_pf_values_equiweight.append(pf_value_t_equiweight)
@@ -273,6 +274,8 @@ def main(stocks=True):
         test_mdd.append(romad)
 
     print("------ test final value -------")
+    # print(test_pf_values)
+    # print(test_pf_values_equiweight)
     print("Mean sharpe ratio : " + str(np.mean(test_sharpe_ratio)))
     print("Mean Max Drawdown:", str(np.mean(test_mdd)))
     plot_cpv(
